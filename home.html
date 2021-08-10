@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      integrity="sha512-PgQMlq+nqFLV4ylk1gwUOgm6CtIIXkKwaIHp/PAIWHzig/lKZSEGKEysh0TCVbHJXCLN7WetD8TFecIky75ZfQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="style.css">
+    <title>Weather App</title>
+  </head>
+  <body>
+    <div class="Search">
+      <label for="City"></label>
+      <input id="City" name="City" type="text" placeholder="City"/>
+      <button id="Find">Find</button>
+    </div>
+    <div class="Details">
+      <h1 id="CityName"></h1>
+      <h1 id="Date"></h3>
+        <h1 id="wbox"></h1>
+        <div id="icon">
+        </div>
+      <h1 id="Temp"></h3>
+    </div>
+  </body>
+  <script>
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ]
+    const days = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ]
+    const btn = document.getElementById('Find')
+    const inputbox = document.getElementById('City')
+    const city_box = document.getElementById('CityName')
+    const date_box = document.getElementById('Date')
+    const temp_box = document.getElementById('Temp')
+    const weather_box = document.getElementById('wbox')
+    btn.addEventListener('click', async function (e) {
+      let key = 'c4fa07104c807594a336d38d74b113ee'
+      let unit = 'metric'
+      let city = inputbox.value
+      let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&units=${unit}/#`
+      console.log(url)
+      let setheaders = {
+        headers: {
+          Accept: 'application/json',
+        },
+      }
+      try {
+        let res = await fetch(url, setheaders)
+        let data = await res.json()
+        const city_name = data.name
+        const today = gettoday()
+        const temp = data.main.temp - 273
+
+            // inputing values to fields
+        city_box.innerText = city_name
+        date_box.innerText = today
+        temp_box.innerText = temp.toFixed(1)+'° C'
+        const type = data.weather[0].main
+        weather_box.innerText = type
+
+            // adding weather icon
+        const icon_url =
+          'http://openweathermap.org/img/w/' + data.weather[0].icon + '.png'
+          let curr_img=document.getElementById('icon_image')
+          // if icon is present already remove it first;
+          if(curr_img){
+              curr_img.remove();
+          }
+          const img = document.createElement('img');
+            img.src = icon_url;
+            img.id = 'icon_image';
+            document.getElementById('icon').appendChild(img);
+
+        document.getElementById('City').value= city_name
+        
+        if (type === 'Rain') {
+          document.body.style.backgroundImage = "url('Rain.jpg')"
+        } else if (type === 'Clouds') {
+          document.body.style.backgroundImage = "url('Clouds.jpg')"
+        } else if (type === 'Mist' || type === 'Haze') {
+          document.body.style.backgroundImage = "url('Mist.png')"
+        }
+        else{
+            document.body.style.backgroundImage = "url('Default.jpg')"
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    })
+    function gettoday() {
+      const D = new Date()
+      var ans = ''
+      ans =
+        days[D.getDay()] + ' | ' + D.getDate() + ' ' + monthNames[D.getMonth()]
+      return ans
+    }
+  </script>
+</html>
+<!-- http://api.openweathermap.org/data/2.5/weather?q=Delhi&appid=c4fa07104c807594a336d38d74b113ee&units=metric/# -->
